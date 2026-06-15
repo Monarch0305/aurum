@@ -67,6 +67,8 @@ export default function AccountsClient({
           }),
         })
         if (!res.ok) throw new Error(await res.text())
+        // Auto-sync so accounts + transactions appear immediately after connecting
+        await fetch('/api/plaid/sync-transactions', { method: 'POST' })
         setState({ status: 'success', errorMsg: '' })
         router.refresh()
       } catch {

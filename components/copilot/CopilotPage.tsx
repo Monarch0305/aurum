@@ -39,95 +39,8 @@ interface Message {
   followUps?: string[]
 }
 
-interface Thread {
-  id: string
-  title: string
-  preview: string
-  date: string
-}
-
 interface CopilotPageProps {
   transactionCount: number
-}
-
-// ─── mock data ────────────────────────────────────────────────────────────────
-
-const THREADS: Thread[] = [
-  { id: 'food-may',  title: 'Food spending in May',      preview: 'How much did I spend on food…',      date: 'Today'     },
-  { id: 'subs',      title: 'Subscription audit',         preview: 'Find all my recurring subscriptions', date: 'Yesterday' },
-  { id: 'savings',   title: 'Savings rate analysis',      preview: 'What is my savings rate this month?', date: 'Jun 1'     },
-  { id: 'budget',    title: 'Monthly budget review',      preview: 'Review my overall spending budget',   date: 'May 28'    },
-  { id: 'amazon',    title: 'Amazon spending trend',      preview: 'How much have I spent on Amazon?',    date: 'May 24'    },
-]
-
-const FOOD_CONV: Message[] = [
-  {
-    id: 'f1', role: 'user',
-    content: 'How much did I spend on food in May?',
-    timestamp: '2:14 PM',
-  },
-  {
-    id: 'f2', role: 'assistant',
-    content: "Here's your complete food spending breakdown for May 2026. You spent **₹842.50** across all food categories — that's 12% higher than April (₹752.20). Dining out at restaurants accounts for exactly half your food budget, with groceries a close second.",
-    timestamp: '2:14 PM',
-    card: {
-      title: 'Food & Dining',
-      total: 842.50,
-      period: 'May 2026',
-      changePercent: 12,
-      chartData: [
-        { label: 'Wk 1', amount: 140 },
-        { label: 'Wk 2', amount: 185 },
-        { label: 'Wk 3', amount: 220 },
-        { label: 'Wk 4', amount: 172 },
-        { label: 'Wk 5', amount: 95  },
-        { label: 'Wk 6', amount: 30  },
-      ],
-      breakdown: [
-        { name: 'Restaurants',  amount: 420.50, color: '#e57373' },
-        { name: 'Groceries',    amount: 280.00, color: '#81c784' },
-        { name: 'Coffee Shop',  amount: 142.00, color: '#ffb74d' },
-      ],
-    },
-    followUps: ['Compare to last month', 'Which restaurant cost the most?', 'How to reduce food spending?'],
-  },
-]
-
-const SUBS_CONV: Message[] = [
-  {
-    id: 's1', role: 'user',
-    content: 'Find all my recurring subscriptions',
-    timestamp: '11:30 AM',
-  },
-  {
-    id: 's2', role: 'assistant',
-    content: "I found **6 active subscriptions** in your transaction history totalling **₹87.94/month** — that's ₹1,055.28 per year, roughly 2.1% of your estimated monthly income. Three of the charges appeared for the first time in March, suggesting recent signups.",
-    timestamp: '11:31 AM',
-    card: {
-      title: 'Recurring Subscriptions',
-      total: 87.94,
-      period: 'Per month',
-      chartData: [
-        { label: 'Jan', amount: 75.94 },
-        { label: 'Feb', amount: 75.94 },
-        { label: 'Mar', amount: 87.94 },
-        { label: 'Apr', amount: 87.94 },
-        { label: 'May', amount: 87.94 },
-        { label: 'Jun', amount: 87.94 },
-      ],
-      breakdown: [
-        { name: 'Streaming',  amount: 35.97, color: '#64b5f6' },
-        { name: 'Software',   amount: 29.97, color: '#ba68c8' },
-        { name: 'Fitness',    amount: 22.00, color: '#81c784' },
-      ],
-    },
-    followUps: ['Which ones can I cancel?', 'Compare to average spending', 'Set a subscription budget'],
-  },
-]
-
-const CONV_MAP: Record<string, Message[]> = {
-  'food-may': FOOD_CONV,
-  'subs': SUBS_CONV,
 }
 
 // ─── prompt starters ──────────────────────────────────────────────────────────
@@ -439,7 +352,7 @@ function PromptStartersGrid({ onSelect }: { onSelect: (q: string) => void }) {
           Finance Copilot
         </h2>
         <p style={{ fontSize: 13, color: 'rgba(240,236,226,0.4)', margin: 0 }}>
-          Ask anything about your money in plain English
+          Ask me anything about your finances
         </p>
       </div>
 
@@ -548,8 +461,7 @@ export default function CopilotPage({ transactionCount }: CopilotPageProps) {
   const searchParams = useSearchParams()
   const initialQ = searchParams.get('q') ?? ''
 
-  const [activeId, setActiveId] = useState<string>('food-may')
-  const [messages, setMessages] = useState<Message[]>(CONV_MAP['food-may'] ?? [])
+  const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState(initialQ)
   const [loading, setLoading] = useState(false)
 
@@ -566,22 +478,14 @@ export default function CopilotPage({ transactionCount }: CopilotPageProps) {
   useEffect(() => {
     if (!initialQ || hasSentInitialRef.current) return
     hasSentInitialRef.current = true
-    // Clear mock thread so the auto-send starts a clean conversation
-    setActiveId('new')
+    // Ensure we start from a clean state before the auto-send
     setMessages([])
     // setTimeout lets the cleared state commit before handleSend reads it
     const t = setTimeout(() => handleSend(initialQ), 0)
     return () => clearTimeout(t)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const switchThread = (id: string) => {
-    setActiveId(id)
-    setMessages(CONV_MAP[id] ?? [])
-    setInput('')
-  }
-
   const newChat = () => {
-    setActiveId('new')
     setMessages([])
     setInput('')
     inputRef.current?.focus()
@@ -715,82 +619,23 @@ export default function CopilotPage({ transactionCount }: CopilotPageProps) {
             gap: 2,
           }}
         >
-          {THREADS.map((thread) => {
-            const isActive = activeId === thread.id
-            return (
-              <button
-                key={thread.id}
-                onClick={() => switchThread(thread.id)}
-                style={{
-                  width: '100%',
-                  textAlign: 'left',
-                  padding: '9px 10px',
-                  borderRadius: 8,
-                  background: isActive ? 'rgba(212,175,55,0.1)' : 'transparent',
-                  border: 'none',
-                  borderLeft: isActive
-                    ? '2px solid rgba(212,175,55,0.45)'
-                    : '2px solid transparent',
-                  cursor: 'pointer',
-                  transition: 'background 0.12s',
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive)
-                    (e.currentTarget as HTMLElement).style.background =
-                      'rgba(212,175,55,0.05)'
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive)
-                    (e.currentTarget as HTMLElement).style.background = 'transparent'
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 4,
-                    marginBottom: 3,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 12,
-                      fontWeight: isActive ? 500 : 400,
-                      color: isActive ? '#D4AF37' : 'rgba(240,236,226,0.65)',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      flex: 1,
-                    }}
-                  >
-                    {thread.title}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: 10,
-                      color: 'rgba(240,236,226,0.28)',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {thread.date}
-                  </span>
-                </div>
-                <p
-                  style={{
-                    fontSize: 11,
-                    color: 'rgba(240,236,226,0.3)',
-                    margin: 0,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {thread.preview}
-                </p>
-              </button>
-            )
-          })}
+          <div
+            style={{
+              padding: '32px 16px',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <MessageSquare size={20} color="rgba(212,175,55,0.25)" />
+            <p style={{ fontSize: 12, color: 'rgba(240,236,226,0.22)', margin: 0, lineHeight: 1.5 }}>
+              No conversations yet.
+              <br />
+              Start asking below.
+            </p>
+          </div>
         </div>
       </div>
 

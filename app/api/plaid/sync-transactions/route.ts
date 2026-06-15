@@ -95,7 +95,7 @@ export async function POST() {
               currency: acc.balances.iso_currency_code ?? 'INR',
               last_synced: new Date().toISOString(),
             })),
-            { onConflict: 'user_id,plaid_account_id' }
+            { onConflict: 'plaid_account_id' }
           )
           if (acctErr) console.error('[sync-transactions] accounts upsert:', acctErr)
         }
