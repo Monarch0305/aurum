@@ -13,7 +13,6 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react'
-import type { PlaidItem } from '@/types'
 import { GoldSelect } from '@/components/ui/gold-select'
 
 // ─── Types ────────────────────────────────────────────────────────────────────

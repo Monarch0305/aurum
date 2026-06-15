@@ -12,10 +12,10 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
+import type { TooltipProps } from 'recharts'
 import type { MonthBucket } from './IncomeExpensesChart'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function DualTooltip({ active, payload, label }: any) {
+function DualTooltip({ active, payload, label }: TooltipProps<number, string>) {
   if (!active || !payload?.length) return null
   return (
     <div
@@ -31,7 +31,7 @@ function DualTooltip({ active, payload, label }: any) {
       <p style={{ fontSize: 11, color: 'rgba(240,236,226,0.45)', margin: '0 0 8px' }}>
         {label}
       </p>
-      {payload.map((p: any) => (
+      {payload.map((p) => (
         <div
           key={p.dataKey}
           style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}

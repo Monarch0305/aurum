@@ -4,21 +4,6 @@ function S({ w = '100%', h = 14, r = 6 }: { w?: string | number; h?: number; r?:
   )
 }
 
-// Suggested prompt chip skeleton
-function ChipSk({ w }: { w: number }) {
-  return (
-    <div
-      className="skeleton"
-      style={{
-        width: w,
-        height: 36,
-        borderRadius: 10,
-        flexShrink: 0,
-      }}
-    />
-  )
-}
-
 export default function CopilotLoading() {
   return (
     <div
