@@ -23,6 +23,10 @@ export default async function ProtectedLayout({
     .eq('user_id', user.id)
     .maybeSingle()
 
+  if (!profileData?.display_name) {
+    redirect('/onboarding')
+  }
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#09090d' }}>
       <Sidebar userEmail={user.email!} displayName={profileData?.display_name ?? null} />

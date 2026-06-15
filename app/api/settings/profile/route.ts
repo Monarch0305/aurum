@@ -27,12 +27,15 @@ export async function PATCH(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json()
-  const { display_name, preferences, notifications } = body
+  const { display_name, preferences, notifications, date_of_birth, city, country } = body
 
   const update: Record<string, unknown> = { user_id: user.id }
   if (display_name !== undefined) update.display_name = display_name
   if (preferences !== undefined) update.preferences = preferences
   if (notifications !== undefined) update.notifications = notifications
+  if (date_of_birth !== undefined) update.date_of_birth = date_of_birth
+  if (city !== undefined) update.city = city
+  if (country !== undefined) update.country = country
 
   const admin = createAdminClient()
   const { error } = await admin

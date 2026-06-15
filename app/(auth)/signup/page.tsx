@@ -40,7 +40,7 @@ export default function SignupPage() {
       setSuccess(true)
       setLoading(false)
     } else {
-      router.push('/dashboard')
+      router.push('/onboarding')
       router.refresh()
     }
   }
