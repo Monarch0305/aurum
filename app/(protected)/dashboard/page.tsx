@@ -41,7 +41,7 @@ export default async function DashboardPage() {
   const eolmStr = fmtDate(eolm)
 
   // Parallel fetch — all queries hit Supabase at once
-  const [accountsRes, yearTxnsRes, recentTxnsRes, aiInsights] = await Promise.all([
+  const [accountsRes, yearTxnsRes, recentTxnsRes, aiInsights, profileRes] = await Promise.all([
     supabase
       .from('accounts')
       .select('balance, currency, name')
@@ -63,6 +63,12 @@ export default async function DashboardPage() {
       .limit(8),
 
     buildDashboardInsights(user!.id),
+
+    supabase
+      .from('profiles')
+      .select('display_name')
+      .eq('user_id', user!.id)
+      .maybeSingle(),
   ])
 
   const accounts = accountsRes.data ?? []
@@ -188,7 +194,7 @@ export default async function DashboardPage() {
   const hour = today.getHours()
   const greeting =
     hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
-  const username = user!.email?.split('@')[0] ?? 'there'
+  const username = profileRes.data?.display_name || user!.email?.split('@')[0] || 'there'
   const dateDisplay = today.toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',

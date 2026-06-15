@@ -1,6 +1,6 @@
-function S({ w = '100%', h = 14, r = 6 }: { w?: string | number; h?: number; r?: number }) {
+function S({ w = '100%', h = 14, r = 6, style }: { w?: string | number; h?: number; r?: number; style?: React.CSSProperties }) {
   return (
-    <div className="skeleton" style={{ width: w, height: h, borderRadius: r, flexShrink: 0 }} />
+    <div className="skeleton" style={{ width: w, height: h, borderRadius: r, flexShrink: 0, ...style }} />
   )
 }
 

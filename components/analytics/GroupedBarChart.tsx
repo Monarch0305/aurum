@@ -12,10 +12,13 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import type { TooltipProps } from 'recharts'
 import type { MonthBucket } from './IncomeExpensesChart'
 
-function DualTooltip({ active, payload, label }: TooltipProps<number, string>) {
+function DualTooltip({ active, payload, label }: {
+  active?: boolean
+  payload?: Array<{ name?: string; value?: number; fill?: string }>
+  label?: string | number
+}) {
   if (!active || !payload?.length) return null
   return (
     <div
@@ -33,7 +36,7 @@ function DualTooltip({ active, payload, label }: TooltipProps<number, string>) {
       </p>
       {payload.map((p) => (
         <div
-          key={p.dataKey}
+          key={p.name}
           style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}
         >
           <div

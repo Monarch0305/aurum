@@ -12,7 +12,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import type { TooltipProps } from 'recharts'
 
 export interface MonthBucket {
   label: string
@@ -21,7 +20,11 @@ export interface MonthBucket {
   net: number
 }
 
-function DualTooltip({ active, payload, label }: TooltipProps<number, string>) {
+function DualTooltip({ active, payload, label }: {
+  active?: boolean
+  payload?: Array<{ name?: string; value?: number; stroke?: string }>
+  label?: string | number
+}) {
   if (!active || !payload?.length) return null
   return (
     <div
@@ -39,7 +42,7 @@ function DualTooltip({ active, payload, label }: TooltipProps<number, string>) {
       </p>
       {payload.map((p) => (
         <div
-          key={p.dataKey}
+          key={p.name}
           style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}
         >
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: p.stroke, flexShrink: 0 }} />
